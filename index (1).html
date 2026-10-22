@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>youtube</title>
+
+  <style>
+    /* =====================================================
+       1. Variables & base
+       ===================================================== */
+    :root {
+      --header-h: 55px;
+      --sidebar-w: 72px;
+      --bottom-nav-h: 60px;
+      --border: rgb(228, 228, 228);
+      --border-input: rgb(192, 192, 192);
+      --bg-hover: rgb(235, 235, 235);
+      --bg-button: rgb(240, 240, 240);
+      --text-muted: rgb(96, 96, 96);
+      --accent: red;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      --ease: 0.3s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: calc(var(--header-h) + 15px) 60px 40px calc(var(--sidebar-w) + 20px);
+      font-family: var(--font-ui);
+      background-color: white;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid #065fd4;
+      outline-offset: 2px;
+    }
+
+    /* =====================================================
+       2. Header
+       ===================================================== */
+    .header {
+      height: var(--header-h);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+
+      background-color: white;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .left-section {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .youtube-logo {
+      height: 25px;
+      width: auto;
+      margin-left: 10px;
+    }
+
+    .middle-section {
+      margin-left: 75px;
+      margin-right: 35px;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+      max-width: 500px;
+    }
+
+    .search-bar {
+      flex: 1;
+      width: 0;
+      min-width: 0;
+      height: 36px;
+      padding-left: 10px;
+      margin-left: 10px;
+      margin-right: 10px;
+
+      border: 1px solid var(--border-input);
+      border-radius: 10px;
+      font-size: 16px; /* 16px prevents iOS Safari from zooming on focus */
+      font-family: Arial, sans-serif;
+      box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-bar::placeholder {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+
+    .search-button {
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      height: 40px;
+      width: 66px;
+      margin-left: -1px;
+      margin-right: 10px;
+      padding: 0;
+
+      background-color: var(--bg-button);
+      border: 1px solid var(--border-input);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .search-icon {
+      width: 30px;
+    }
+
+    .search-button:hover,
+    .search-button:focus-visible {
+      background-color: var(--accent);
+    }
+
+    .search-button .tooltip {
+      position: absolute;
+      bottom: -30px;
+      padding: 4px 8px;
+
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 12px;
+      white-space: nowrap;
+      color: white;
+      background-color: gray;
+      border-radius: 2px;
+
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+
+    .search-button:hover .tooltip,
+    .search-button:focus-visible .tooltip {
+      opacity: 1;
+    }
+
+    .right-section {
+      width: 180px;
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      background: none;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .icon-button:hover {
+      background-color: var(--bg-hover);
+    }
+
+    /* =====================================================
+       3. Sidebar navigation
+       ===================================================== */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h);
+      bottom: 0;
+      left: 0;
+      width: var(--sidebar-w);
+      z-index: 200;
+      padding-top: 5px;
+      background-color: white;
+    }
+
+    .sidebar-link {
+      height: 65px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link:focus-visible {
+      background-color: var(--bg-hover);
+    }
+
+    .sidebar-link img {
+      height: 24px;
+      width: auto;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-link span {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    /* =====================================================
+       4. Video grid & cards
+       ===================================================== */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 16px;
+      row-gap: 40px;
+    }
+
+    .video-card {
+      min-width: 0;
+      cursor: pointer;
+      transition: transform var(--ease);
+    }
+
+    .video-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .thumbnail-row {
+      position: relative;
+      display: block;
+      margin-bottom: 8px;
+      overflow: hidden;
+      border-radius: 12px;
+      background-color: var(--bg-button);
+      aspect-ratio: 16 / 9;
+    }
+
+    .thumbnail {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .video-card:hover .thumbnail {
+      transform: scale(1.08);
+    }
+
+    .play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+
+      font-size: 16px;
+      color: white;
+      background: var(--accent);
+      transition: transform var(--ease);
+    }
+
+    .video-card:hover .play,
+    .thumbnail-row:focus-visible .play {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .video-time {
+      position: absolute;
+      bottom: 8px;
+      right: 5px;
+      padding: 4px;
+
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: white;
+      background-color: black;
+      border-radius: 2px;
+    }
+
+    .video-info {
+      font-size: 20px;
+      line-height: 20px;
+      position: relative;
+    }
+
+    .video-title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 0 10px;
+
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .video-title a:hover {
+      text-decoration: underline;
+    }
+
+    .video-author,
+    .video-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+
+      font-family: var(--font-ui);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .video-author {
+      margin-bottom: 4px;
+    }
+
+    /* =====================================================
+       5. Responsive breakpoints
+       ===================================================== */
+
+    /* Laptops / small desktops */
+    @media (max-width: 1200px) {
+      body {
+        padding-right: 30px;
+      }
+
+      .middle-section {
+        margin-left: 40px;
+        margin-right: 20px;
+      }
+    }
+
+    /* Tablets: 2 columns */
+    @media (max-width: 900px) {
+      body {
+        padding-right: 20px;
+        padding-left: calc(var(--sidebar-w) + 16px);
+      }
+
+      .video-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: 32px;
+      }
+
+      .middle-section {
+        margin-left: 20px;
+        margin-right: 10px;
+      }
+
+      .right-section {
+        width: auto;
+        margin-right: 16px;
+      }
+    }
+
+    /* Phones: 1 column, sidebar becomes a bottom navigation bar */
+    @media (max-width: 600px) {
+      :root {
+        --sidebar-w: 0px;
+      }
+
+      body {
+        padding: calc(var(--header-h) + 12px) 12px calc(var(--bottom-nav-h) + 24px + env(safe-area-inset-bottom)) 12px;
+      }
+
+      .header {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+      }
+
+      .youtube-logo {
+        height: 20px;
+        margin-left: 12px;
+      }
+
+      .middle-section {
+        margin-left: 6px;
+        margin-right: 4px;
+      }
+
+      .search-bar {
+        margin-left: 6px;
+        margin-right: 6px;
+      }
+
+      .search-button {
+        width: 50px;
+        margin-right: 6px;
+      }
+
+      .right-section {
+        margin-right: 8px;
+        margin-left: 4px;
+      }
+
+      .video-grid {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 28px;
+      }
+
+      .sidebar {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+        padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        display: flex;
+        flex-direction: row;
+        border-top: 1px solid var(--border);
+      }
+
+      .sidebar-link {
+        flex: 1;
+        height: var(--bottom-nav-h);
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .search-button {
+        width: 44px;
+      }
+
+      .search-icon {
+        width: 24px;
+      }
+
+      .right-section {
+        margin-right: 4px;
+      }
+    }
+
+    /* Touch devices: no hover effects, tooltip hidden */
+    @media (hover: none) {
+      .video-card:hover {
+        transform: none;
+      }
+
+      .video-card:hover .thumbnail {
+        transform: none;
+      }
+
+      .video-card:hover .play {
+        transform: translate(-50%, -50%) scale(0);
+      }
+
+      .search-button:hover {
+        background-color: var(--bg-button);
+      }
+
+      .search-button .tooltip {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="left-section">
+      <a href="#" aria-label="YouTube home">
+        <img class="youtube-logo" src="icons/youtube-logo.svg" alt="YouTube">
+      </a>
+    </div>
+
+    <form class="middle-section" role="search" id="search-form">
+      <input class="search-bar" type="search" name="q" placeholder="search" aria-label="Search">
+      <button class="search-button" type="submit" aria-label="Search">
+        <img class="search-icon" src="icons/search.svg" alt="">
+        <span class="tooltip">Search</span>
+      </button>
+    </form>
+
+    <div class="right-section">
+      <button class="icon-button" type="button" aria-label="Notifications">
+        <img class="notifications-icon" src="icons/notifications.svg" alt="">
+      </button>
+    </div>
+  </header>
+
+  <nav class="sidebar" aria-label="Main navigation">
+    <a class="sidebar-link" href="#">
+      <img src="icons/home.svg" alt="">
+      <span>home</span>
+    </a>
+    <a class="sidebar-link" href="#">
+      <img src="icons/youtube-music.svg" alt="">
+      <span>youtube music</span>
+    </a>
+    <a class="sidebar-link" href="#">
+      <img src="icons/subscriptions.svg" alt="">
+      <span>subscriptions</span>
+    </a>
+  </nav>
+
+  <main class="video-grid">
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=BCoyfKHVy8Y&amp;t=38s&amp;pp=ygUM2KfZhNiv2K3Zitit" target="_blank" rel="noopener noreferrer" aria-label="Play: الدحيح | انتقام الحوت القاتل">
+        <img class="thumbnail" src="pictures/hq720.jpg" alt="الدحيح | انتقام الحوت القاتل" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">34:15</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=BCoyfKHVy8Y&amp;t=38s&amp;pp=ygUM2KfZhNiv2K3Zitit" target="_blank" rel="noopener noreferrer">الدحيح | انتقام الحوت القاتل</a>
+        </h3>
+        <p class="video-author" lang="ar">الدحيح</p>
+        <p class="video-stats" dir="rtl" lang="ar">3.8 مشاهدة مليون &#183; منذ 2شهر</p>
+      </div>
+    </article>
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=2G93KzLoNaw&amp;pp=ygUz2K3YqNmK2KjZiiDYp9mG2Kcg2YXZhiDYutmK2LHZgyDZhdit2YXYryDYsdmF2LbYp9mG" target="_blank" rel="noopener noreferrer" aria-label="Play: اغنية حبيبي انا من غيرك - محمد رمضان">
+        <img class="thumbnail" src="pictures/mr1.jpg" alt="اغنية حبيبي انا من غيرك - محمد رمضان" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">2:51</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=2G93KzLoNaw&amp;pp=ygUz2K3YqNmK2KjZiiDYp9mG2Kcg2YXZhiDYutmK2LHZgyDZhdit2YXYryDYsdmF2LbYp9mG" target="_blank" rel="noopener noreferrer">اغنية حبيبي انا من غيرك - محمد رمضان</a>
+        </h3>
+        <p class="video-author" lang="ar">محمد رمضان</p>
+        <p class="video-stats" dir="rtl" lang="ar">19 مليون مشاهدة &#183; منذ 4 اسابيع</p>
+      </div>
+    </article>
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=wOeBNWcvftE&amp;t=4837s&amp;pp=ygUp2YbYtdmI2K3ZiiDZiCDYp9mE2YPZiNmK2LEg2Ygg2LXYrdio2KrZhyA%3D" target="_blank" rel="noopener noreferrer" aria-label="Play: صباحو تحدي مع عمر مرعي و نصوحي و الكوير و صحبته">
+        <img class="thumbnail" src="pictures/nso7y.jpg" alt="صباحو تحدي مع عمر مرعي و نصوحي و الكوير و صحبته" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">1:23:25</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=wOeBNWcvftE&amp;t=4837s&amp;pp=ygUp2YbYtdmI2K3ZiiDZiCDYp9mE2YPZiNmK2LEg2Ygg2LXYrdio2KrZhyA%3D" target="_blank" rel="noopener noreferrer">صباحو تحدي مع عمر مرعي و نصوحي و الكوير و صحبته</a>
+        </h3>
+        <p class="video-author" lang="ar">صباحو تحدي</p>
+        <p class="video-stats">12M views &#183; 1 year ago</p>
+      </div>
+    </article>
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=2G93KzLoNaw&amp;pp=ygUz2K3YqNmK2KjZiiDYp9mG2Kcg2YXZhiDYutmK2LHZgyDZhdit2YXYryDYsdmF2LbYp9mG" target="_blank" rel="noopener noreferrer" aria-label="Play: اغنية حبيبي انا من غيرك - محمد رمضان">
+        <img class="thumbnail" src="pictures/mr1.jpg" alt="اغنية حبيبي انا من غيرك - محمد رمضان" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">2:51</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=2G93KzLoNaw&amp;pp=ygUz2K3YqNmK2KjZiiDYp9mG2Kcg2YXZhiDYutmK2LHZgyDZhdit2YXYryDYsdmF2LbYp9mG" target="_blank" rel="noopener noreferrer">اغنية حبيبي انا من غيرك - محمد رمضان</a>
+        </h3>
+        <p class="video-author" lang="ar">محمد رمضان</p>
+        <p class="video-stats" dir="rtl" lang="ar">19 مليون مشاهدة &#183; منذ 4 اسابيع</p>
+      </div>
+    </article>
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=BCoyfKHVy8Y&amp;t=38s&amp;pp=ygUM2KfZhNiv2K3Zitit" target="_blank" rel="noopener noreferrer" aria-label="Play: الدحيح | انتقام الحوت القاتل">
+        <img class="thumbnail" src="pictures/hq720.jpg" alt="الدحيح | انتقام الحوت القاتل" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">34:15</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=BCoyfKHVy8Y&amp;t=38s&amp;pp=ygUM2KfZhNiv2K3Zitit" target="_blank" rel="noopener noreferrer">الدحيح | انتقام الحوت القاتل</a>
+        </h3>
+        <p class="video-author" lang="ar">الدحيح</p>
+        <p class="video-stats">519K views &#183; 5 years ago</p>
+      </div>
+    </article>
+
+    <article class="video-card">
+      <a class="thumbnail-row" href="https://www.youtube.com/watch?v=wOeBNWcvftE&amp;t=4837s&amp;pp=ygUp2YbYtdmI2K3ZiiDZiCDYp9mE2YPZiNmK2LEg2Ygg2LXYrdio2KrZhyA%3D" target="_blank" rel="noopener noreferrer" aria-label="Play: صباحو تحدي مع نصوحي و مرعي و الكوير و صحبته">
+        <img class="thumbnail" src="pictures/nso7y.jpg" alt="صباحو تحدي مع نصوحي و مرعي و الكوير و صحبته" loading="lazy" decoding="async">
+        <span class="play" aria-hidden="true">▶</span>
+        <span class="video-time">1:23:25</span>
+      </a>
+      <div class="video-info">
+        <h3 class="video-title" lang="ar">
+          <a href="https://www.youtube.com/watch?v=wOeBNWcvftE&amp;t=4837s&amp;pp=ygUp2YbYtdmI2K3ZiiDZiCDYp9mE2YPZiNmK2LEg2Ygg2LXYrdio2KrZhyA%3D" target="_blank" rel="noopener noreferrer">صباحو تحدي مع نصوحي و مرعي و الكوير و صحبته</a>
+        </h3>
+        <p class="video-author" lang="ar">صباحو تحدي</p>
+        <p class="video-stats">141M views &#183; 1 year ago</p>
+      </div>
+    </article>
+
+  </main>
+
+  <script>
+    (function () {
+      // Search form: keep the page from reloading (no search backend yet).
+      var form = document.getElementById('search-form');
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+        });
+      }
+
+      // Placeholder navigation links: prevent jumping to the top of the page.
+      var links = document.querySelectorAll('a[href="#"]');
+      for (var i = 0; i < links.length; i++) {
+        links[i].addEventListener('click', function (e) {
+          e.preventDefault();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
